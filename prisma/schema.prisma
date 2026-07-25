@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  
+}
+
+enum SourceType {
+  PDF
+  WEBSITE
+  YOUTUBE
+  TEXT
+  TRANSCRIPT
+}
+
+enum SourceStatus {
+  PENDING
+  PROCESSING
+  READY
+  FAILED
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+}
+
+model Notebook {
+  id        String   @id @default(cuid())
+  title     String
+
+  userId    String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sources       Source[]
+  conversations Conversation[]
+
+  @@index([userId])
+}
+
+model Source {
+  id         String       @id @default(cuid())
+  title      String
+  type       SourceType
+  status     SourceStatus @default(PENDING)
+
+  notebookId String
+  notebook   Notebook @relation(fields: [notebookId], references: [id], onDelete: Cascade)
+
+  chunks Chunk[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Chunk {
+  id       String @id @default(cuid())
+  content  String
+
+  sourceId String
+  source   Source @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+}
+
+model Conversation {
+  id         String   @id @default(cuid())
+  notebookId String
+  notebook   Notebook @relation(fields: [notebookId], references: [id], onDelete: Cascade)
+
+  messages Message[]
+
+  createdAt DateTime @default(now())
+}
+
+model Message {
+  id             String      @id @default(cuid())
+  role           MessageRole
+  content        String
+
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}

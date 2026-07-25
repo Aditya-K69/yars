@@ -9,21 +9,50 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Plus } from "lucide-react";
+import {
+  FileText,
+  Globe,
+  ImageIcon,
+  Plus,
+  Video,
+  MoreHorizontal,
+} from "lucide-react";
 
 const sources = [
-  "attention.pdf",
-  "openai-docs",
-  "karpathy-lecture.mp4",
-  "rag-paper.pdf",
-  "architecture.png",
+  {
+    name: "attention.pdf",
+    icon: FileText,
+  },
+  {
+    name: "openai.com/docs",
+    icon: Globe,
+  },
+  {
+    name: "karpathy-lecture.mp4",
+    icon: Video,
+  },
+  {
+    name: "rag-paper.pdf",
+    icon: FileText,
+  },
+  {
+    name: "architecture.png",
+    icon: ImageIcon,
+  },
 ];
 
 export function SourceSidebar() {
@@ -42,16 +71,39 @@ export function SourceSidebar() {
           <SidebarGroupContent className="group-data-[collapsible=icon]:hidden">
             <ScrollArea className="h-full px-2">
               <SidebarMenu className="space-y-1">
-                {sources.map((source) => (
-                  <SidebarMenuItem key={source}>
-                    <SidebarMenuButton
-                      isActive={source === "attention.pdf"}
-                      className="rounded-xl"
-                    >
-                      <span>{source}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                {sources.map((source) => {
+                  const Icon = source.icon;
+
+                  return (
+                    <SidebarMenuItem key={source.name}>
+                      <SidebarMenuButton
+                        isActive={source.name === "attention.pdf"}
+                        className="rounded-md"
+                      >
+                        <Icon className="h-4 w-4 shrink-0" />
+
+                        <span className="truncate">{source.name}</span>
+                      </SidebarMenuButton>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <SidebarMenuAction showOnHover>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </SidebarMenuAction>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>Rename</DropdownMenuItem>
+                          <DropdownMenuItem>View Details</DropdownMenuItem>
+                          <DropdownMenuItem>Re-index</DropdownMenuItem>
+                          <DropdownMenuItem variant="destructive">
+                            Remove
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </SidebarMenuItem>
+                  );
+                })}
               </SidebarMenu>
             </ScrollArea>
           </SidebarGroupContent>

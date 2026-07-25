@@ -10,7 +10,21 @@ export function ChatInput() {
         <textarea
           rows={1}
           placeholder="Ask anything..."
-          className="flex-1 resize-none bg-transparent text-base outline-none placeholder:text-muted-foreground"
+          onInput={(e) => {
+            const target = e.currentTarget;
+            target.style.height = "0px";
+            target.style.height = `${Math.min(target.scrollHeight, 160)}px`;
+          }}
+          className="
+    flex-1
+    resize-none
+    overflow-y-auto
+    bg-transparent
+    text-base
+    leading-6
+    outline-none
+    placeholder:text-muted-foreground
+  "
         />
 
         <Button size="icon" className="h-10 w-10 rounded-full shrink-0">

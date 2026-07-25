@@ -1,28 +1,20 @@
-"use client";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { getUserNotebooks } from "@/lib/notebooks";
 
-import { SourceSidebar } from "@/components/chat/notebook-sidebar";
-import { ChatInput } from "@/components/chat/chat-input";
-import { NotebookBar } from "@/components/chat/notebook-bar";
+export default async function ChatPage() {
+  const { userId } = await auth();
 
-export default function ChatPage() {
-  return (
-    <SidebarProvider>
-      <SourceSidebar />
+  if (!userId) {
+    redirect("/");
+  }
 
-      <SidebarInset>
-        <div className="flex h-screen flex-col bg-background">
-          <main className="flex-1 overflow-y-auto">
-            <div className="mx-auto w-full max-w-3xl px-6 py-8">
-              {/* Messages will go here */}
-            </div>
-          </main>
+  const notebooks = await getUserNotebooks(userId);
 
-          <ChatInput />
-          <NotebookBar />
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
-  );
+  if (notebooks.length === 0) {
+    redirect("/");
+  }
+
+  redirect(`/chat/${notebooks[0].id}`);
 }
