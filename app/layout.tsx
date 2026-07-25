@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Public_Sans, Oxanium } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { ClerkProvider, Show, UserButton } from "@clerk/nextjs";
 
 const oxaniumHeading = Oxanium({
   subsets: ["latin"],
@@ -44,7 +45,14 @@ export default function RootLayout({
         "dark",
       )}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <ClerkProvider>
+          <Show when={"signed-in"}>
+            <UserButton />
+          </Show>
+          {children}
+        </ClerkProvider>
+      </body>
     </html>
   );
 }

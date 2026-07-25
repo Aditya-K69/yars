@@ -41,27 +41,14 @@ export default function HomePage() {
             and create AI-powered workflows—all from a unified platform.
           </p>
 
-          {/* Auth Links */}
-          <div className="mt-14 flex flex-col items-center justify-center gap-5 sm:flex-row sm:gap-8">
+          {/* Get Started */}
+          <div className="mt-14 flex justify-center">
             <Link
-              href="/signup"
-              className="group flex items-center gap-2 rounded-full border border-white/30 bg-white/20 px-7 py-3 text-base backdrop-blur-xl shadow-[0_8px_30px_rgba(255,255,255,0.08)] transition-all duration-300 hover:scale-105 hover:border-white/50 hover:bg-white/30 hover:shadow-[0_10px_40px_rgba(255,255,255,0.15)]"
+              href="/sign-in"
+              className="group flex items-center gap-2 rounded-full border border-white/30 bg-white/20 px-8 py-3 text-base backdrop-blur-xl shadow-[0_8px_30px_rgba(255,255,255,0.08)] transition-all duration-300 hover:scale-105 hover:border-white/50 hover:bg-white/30 hover:shadow-[0_10px_40px_rgba(255,255,255,0.15)]"
             >
-              <span className="text-foreground/80">Not a user yet?</span>
-
               <span className="font-semibold text-foreground transition-transform group-hover:translate-x-1">
-                Sign Up Here →
-              </span>
-            </Link>
-
-            <Link
-              href="/signin"
-              className="group flex items-center gap-2 rounded-full border border-white/30 bg-white/20 px-7 py-3 text-base backdrop-blur-xl shadow-[0_8px_30px_rgba(255,255,255,0.08)] transition-all duration-300 hover:scale-105 hover:border-white/50 hover:bg-white/30 hover:shadow-[0_10px_40px_rgba(255,255,255,0.15)]"
-            >
-              <span className="text-foreground/80">Already a user?</span>
-
-              <span className="font-semibold text-foreground transition-transform group-hover:translate-x-1">
-                Login Here →
+                Get Started →
               </span>
             </Link>
           </div>
