@@ -4,7 +4,55 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  
+}
+
+model Notebook {
+  id            String         @id @default(cuid())
+  title         String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  userId        String
+  conversations Conversation[]
+  sources       Source[]
+
+  @@index([userId])
+}
+
+model Source {
+  id         String       @id @default(cuid())
+  title      String
+  type       SourceType
+  status     SourceStatus @default(PENDING)
+  notebookId String
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  content    String?
+  chunks     Chunk[]
+  notebook   Notebook     @relation(fields: [notebookId], references: [id], onDelete: Cascade)
+}
+
+model Chunk {
+  id       String @id @default(cuid())
+  content  String
+  sourceId String
+  source   Source @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+}
+
+model Conversation {
+  id         String    @id @default(cuid())
+  notebookId String
+  createdAt  DateTime  @default(now())
+  notebook   Notebook  @relation(fields: [notebookId], references: [id], onDelete: Cascade)
+  messages   Message[]
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  role           MessageRole
+  content        String
+  conversationId String
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 }
 
 enum SourceType {
@@ -25,63 +73,4 @@ enum SourceStatus {
 enum MessageRole {
   USER
   ASSISTANT
-}
-
-model Notebook {
-  id        String   @id @default(cuid())
-  title     String
-
-  userId    String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  sources       Source[]
-  conversations Conversation[]
-
-  @@index([userId])
-}
-
-model Source {
-  id         String       @id @default(cuid())
-  title      String
-  type       SourceType
-  status     SourceStatus @default(PENDING)
-
-  notebookId String
-  notebook   Notebook @relation(fields: [notebookId], references: [id], onDelete: Cascade)
-
-  chunks Chunk[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Chunk {
-  id       String @id @default(cuid())
-  content  String
-
-  sourceId String
-  source   Source @relation(fields: [sourceId], references: [id], onDelete: Cascade)
-}
-
-model Conversation {
-  id         String   @id @default(cuid())
-  notebookId String
-  notebook   Notebook @relation(fields: [notebookId], references: [id], onDelete: Cascade)
-
-  messages Message[]
-
-  createdAt DateTime @default(now())
-}
-
-model Message {
-  id             String      @id @default(cuid())
-  role           MessageRole
-  content        String
-
-  conversationId String
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
 }

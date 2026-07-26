@@ -6,9 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { ChatInput } from "@/components/chat/chat-input";
 import { Message as ChatMessageBubble } from "@/components/chat/message";
 
-type ChatMessage = Message & {
-  thinking?: boolean;
-};
+type ChatMessage = Message;
 
 type ChatProps = {
   notebook: {
@@ -35,10 +33,9 @@ export function Chat({ notebook, initialMessages }: ChatProps) {
   async function handleSend() {
     const content = input.trim();
 
-    if (!content || isLoading) {
-      return;
-    }
+    if (!content || isLoading) return;
 
+    setInput("");
     setIsLoading(true);
 
     const userMessage: ChatMessage = {
@@ -49,19 +46,19 @@ export function Chat({ notebook, initialMessages }: ChatProps) {
       createdAt: new Date(),
     };
 
-    const thinkingId = crypto.randomUUID();
+    const assistantId = crypto.randomUUID();
 
-    const thinkingMessage: ChatMessage = {
-      id: thinkingId,
-      role: "ASSISTANT",
-      content: "",
-      conversationId: "",
-      createdAt: new Date(),
-      thinking: true,
-    };
-
-    setMessages((prev) => [...prev, userMessage, thinkingMessage]);
-    setInput("");
+    setMessages((prev) => [
+      ...prev,
+      userMessage,
+      {
+        id: assistantId,
+        role: "ASSISTANT",
+        content: "",
+        conversationId: "",
+        createdAt: new Date(),
+      },
+    ]);
 
     try {
       const response = await fetch("/api/chat", {
@@ -75,35 +72,44 @@ export function Chat({ notebook, initialMessages }: ChatProps) {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to send message");
+      if (!response.body) {
+        throw new Error("No response body");
       }
 
-      const data = await response.json();
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      let fullText = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) break;
+
+        fullText += decoder.decode(value, { stream: true });
+
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId
+              ? {
+                  ...m,
+                  content: fullText,
+                }
+              : m,
+          ),
+        );
+      }
+    } catch (err) {
+      console.error(err);
 
       setMessages((prev) =>
-        prev.map((message) =>
-          message.id === thinkingId
+        prev.map((m) =>
+          m.id === assistantId
             ? {
-                ...message,
-                thinking: false,
-                content: data.message,
-              }
-            : message,
-        ),
-      );
-    } catch (error) {
-      console.error(error);
-
-      setMessages((prev) =>
-        prev.map((message) =>
-          message.id === thinkingId
-            ? {
-                ...message,
-                thinking: false,
+                ...m,
                 content: "Something went wrong.",
               }
-            : message,
+            : m,
         ),
       );
     } finally {
@@ -135,7 +141,6 @@ export function Chat({ notebook, initialMessages }: ChatProps) {
                   key={message.id}
                   role={message.role}
                   content={message.content}
-                  thinking={message.thinking}
                 />
               ))}
 

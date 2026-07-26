@@ -1,5 +1,6 @@
 "use client";
 
+import { SourceStatus, SourceType } from "@prisma/client";
 import {
   Sidebar,
   SidebarContent,
@@ -21,41 +22,32 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  FileText,
-  Globe,
-  ImageIcon,
-  Plus,
-  Video,
-  MoreHorizontal,
-} from "lucide-react";
+import { AddSourceDialog } from "@/components/chat/add-source-dialog";
 
-const sources = [
-  {
-    name: "attention.pdf",
-    icon: FileText,
-  },
-  {
-    name: "openai.com/docs",
-    icon: Globe,
-  },
-  {
-    name: "karpathy-lecture.mp4",
-    icon: Video,
-  },
-  {
-    name: "rag-paper.pdf",
-    icon: FileText,
-  },
-  {
-    name: "architecture.png",
-    icon: ImageIcon,
-  },
-];
+import { FileText, Globe, MoreHorizontal, Plus, Video } from "lucide-react";
 
-export function SourceSidebar() {
+type SourceSidebarProps = {
+  notebookId: string;
+
+  sources: {
+    id: string;
+    title: string;
+    type: SourceType;
+    status: SourceStatus;
+  }[];
+};
+const sourceIcons = {
+  PDF: FileText,
+  TEXT: FileText,
+  WEBSITE: Globe,
+  YOUTUBE: Video,
+  TRANSCRIPT: FileText,
+};
+
+export function SourceSidebar({ notebookId, sources }: SourceSidebarProps) {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="flex justify-center py-4">
@@ -72,21 +64,21 @@ export function SourceSidebar() {
             <ScrollArea className="h-full px-2">
               <SidebarMenu className="space-y-1">
                 {sources.map((source) => {
-                  const Icon = source.icon;
+                  const Icon = sourceIcons[source.type];
 
                   return (
-                    <SidebarMenuItem key={source.name}>
+                    <SidebarMenuItem key={source.id}>
                       <SidebarMenuButton
-                        isActive={source.name === "attention.pdf"}
+                        isActive={false}
                         className="rounded-md"
                       >
                         <Icon className="h-4 w-4 shrink-0" />
 
-                        <span className="truncate">{source.name}</span>
+                        <span className="truncate">{source.title}</span>
                       </SidebarMenuButton>
 
                       <DropdownMenu>
-                        <DropdownMenuTrigger>
+                        <DropdownMenuTrigger asChild>
                           <SidebarMenuAction showOnHover>
                             <MoreHorizontal className="h-4 w-4" />
                           </SidebarMenuAction>
@@ -111,27 +103,7 @@ export function SourceSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="px-2 pb-3">
-        <Button
-          variant="ghost"
-          className="
-    w-full
-    h-11
-    justify-start
-    rounded-lg
-
-    group-data-[collapsible=icon]:w-9
-    group-data-[collapsible=icon]:h-9
-    group-data-[collapsible=icon]:mx-auto
-    group-data-[collapsible=icon]:justify-center
-    group-data-[collapsible=icon]:rounded-md
-  "
-        >
-          <Plus className="h-4 w-4 shrink-0" />
-
-          <span className="ml-2 group-data-[collapsible=icon]:hidden">
-            Add Source
-          </span>
-        </Button>
+        <AddSourceDialog notebookId={notebookId} />
       </SidebarFooter>
     </Sidebar>
   );

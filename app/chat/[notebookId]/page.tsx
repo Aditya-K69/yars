@@ -9,6 +9,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 import { getNotebookById, getUserNotebooks } from "@/lib/notebooks";
 import { getConversationMessages, getOrCreateConversation } from "@/lib/chat";
+import { getNotebookSources } from "@/lib/sources";
 
 type Props = {
   params: Promise<{
@@ -36,10 +37,11 @@ export default async function ChatPage({ params }: Props) {
   const conversation = await getOrCreateConversation(notebook.id);
 
   const messages = await getConversationMessages(conversation.id);
+  const sources = await getNotebookSources(notebook.id, userId);
 
   return (
     <SidebarProvider>
-      <SourceSidebar />
+      <SourceSidebar notebookId={notebook.id} sources={sources} />
 
       <SidebarInset>
         <div className="flex h-screen flex-col bg-background">

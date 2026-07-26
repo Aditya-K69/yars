@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-import { getUserNotebooks } from "@/lib/notebooks";
+import { createNotebook, getUserNotebooks } from "@/lib/notebooks";
 
 export default async function ChatPage() {
   const { userId } = await auth();
@@ -13,7 +13,9 @@ export default async function ChatPage() {
   const notebooks = await getUserNotebooks(userId);
 
   if (notebooks.length === 0) {
-    redirect("/");
+    const notebook = await createNotebook(userId, "Untitled Notebook");
+
+    redirect(`/chat/${notebook.id}`);
   }
 
   redirect(`/chat/${notebooks[0].id}`);
